@@ -11,9 +11,9 @@ function App() {
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
 
   //If the previous letters include the current letter then nothing happens and the previous letter is returned. However of the letter is new, then it is added onto the previous letters.
-  // this also stops a duplication of letters.
-  // The function is on keyboardElements buttons as I map through each letter from the alphabet and give it a button. There the user will interact
-  // And their guess will be passed in here.
+  //This also stops a duplication of letters.
+  //The function is on keyboardElements buttons as I map through each letter from the alphabet and give it a button. There the user will interact
+  //and their guess will be passed in here.
   function addGuessedLetter(letter) {
     setGuessedLetters((prevLetters) =>
       prevLetters.includes(letter) ? prevLetters : [...prevLetters, letter]
