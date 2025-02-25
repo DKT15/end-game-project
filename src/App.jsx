@@ -7,7 +7,15 @@ function App() {
   const [currentWord, setCurrentWord] = React.useState("react");
   const [guessedLetters, setGuessedLetters] = React.useState([]);
 
-  // global variable used throughout code.
+  // Derived value
+  // This is filtering out the correct letters by checking that the current letter does not include the letter that is in the current word.
+  // . length gets the the number of wrong guesses from the array.
+  const wrongGuessCount = guessedLetters.filter(
+    (letter) => !currentWord.includes(letter)
+  ).length;
+  console.log(wrongGuessCount);
+
+  // global variable used throughout code. Is also a static value.
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
 
   //If the previous letters include the current letter then nothing happens and the previous letter is returned. However of the letter is new, then it is added onto the previous letters.
@@ -22,13 +30,19 @@ function App() {
 
   //mapping over all the languages in the languages.js file. For every language it will be a span and will have its colour and background color applied along with a className
   //and key. language.name has been tapped into to get to additional properties needed from the js file.
-  const languageElements = languages.map((language) => {
+  // With isLanguageLost, getting access to the current item in the array using index. The language array will always be in the same order therefore, if there is a wrong guess count of 1,
+  // then any index that is less than the number of wrong guesses (i.e. the index is equal to 0), this is a lost language and the expression below will be true. It will increment therefore,
+  // the index will become one as it moves to the next language and if the user guesses incorrectly again, wrongGuessesCount will return true and this will mean another language is lost.
+  const languageElements = languages.map((language, index) => {
+    const isLanguageLost = index < wrongGuessCount;
     const styles = {
       backgroundColor: language.backgroundColor,
       color: language.color,
     };
+    //If true the lost class will be applied, but if false the chip will be applied.
+    const languageClass = clsx("chip", isLanguageLost && "lost");
     return (
-      <span className="chip" style={styles} key={language.name}>
+      <span className={languageClass} style={styles} key={language.name}>
         {language.name}
       </span>
     );
