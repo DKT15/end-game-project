@@ -13,7 +13,9 @@ function App() {
   const wrongGuessCount = guessedLetters.filter(
     (letter) => !currentWord.includes(letter)
   ).length;
-  console.log(wrongGuessCount);
+  // If the wrongGuessCount is greater than the languages length than the game is over.
+  // -1 is there to make sure Assembly is the only one standing at the end of the game.
+  const isGameOver = wrongGuessCount >= languages.length - 1;
 
   // global variable used throughout code. Is also a static value.
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
@@ -105,7 +107,7 @@ function App() {
       <section className="language-chips">{languageElements}</section>
       <section className="word">{letterElements}</section>
       <section className="keyboard">{keyboardElements}</section>
-      <button className="new-game">New Game</button>
+      {isGameOver && <button className="new-game">New Game</button>}
     </>
   );
 }
