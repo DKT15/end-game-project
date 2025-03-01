@@ -13,9 +13,18 @@ function App() {
   const wrongGuessCount = guessedLetters.filter(
     (letter) => !currentWord.includes(letter)
   ).length;
-  // If the wrongGuessCount is greater than the languages length than the game is over.
+
+  // The current word is split and I check to see if every letter in the current word is in the array of guessedLetters
+  // so I use the includes method to check to see if the guessedLetter includes a correct letter in the current word.
+  // If the guessedLetter is equal to the letter in the current word the expression will return true as a boolean.
+  // If the wrongGuessCount is greater than or euqal to the languages length than the game has been lost.
   // -1 is there to make sure Assembly is the only one standing at the end of the game.
-  const isGameOver = wrongGuessCount >= languages.length - 1;
+  // Now the isGameOver variable is created and is equal either or game won or lost.
+  const isGameWon = currentWord
+    .split("")
+    .every((letter) => guessedLetters.includes(letter));
+  const isGameLost = wrongGuessCount >= languages.length - 1;
+  const isGameOver = isGameWon || isGameLost;
 
   // global variable used throughout code. Is also a static value.
   const alphabet = "abcdefghijklmnopqrstuvwxyz";
@@ -75,6 +84,7 @@ function App() {
       correct: isCorrect,
       wrong: isWrong,
     });
+
     //Anonymous inline function used to stop JS returning an object.
     //Each letter is set to uppercase.
     //Each letter is checked against whether or not it is correct and will turn red or green when clicked.
@@ -91,6 +101,38 @@ function App() {
     );
   });
 
+  // CLSX is used to conditionally render the classes based on whether the game has been won or lost.
+  // It is applied to the CSS logic. The first argument in CLSX tells the code to always use that class at the beginning.
+  const gameStatusClass = clsx("game-status", {
+    won: isGameWon,
+    lost: isGameLost,
+  });
+
+  // Inside the helper function an if else statement can be used. Can't do it in JSX.
+  // If the game is not over, then return null. If isGameOver is true, skip to the next part of the code
+  // where I check if the game is won and if it is, then return the well done message and if it is not won,
+  // then display the loser message.
+  function renderGameStatus() {
+    if (!isGameOver) {
+      return null;
+    }
+    if (isGameWon) {
+      return (
+        <>
+          <h2>You Win!</h2>
+          <p>Well done! 🎉</p>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <h2>Game over!</h2>
+          <p>You lose! Better start learning Assembly 😭</p>
+        </>
+      );
+    }
+  }
+
   return (
     <>
       <header>
@@ -100,10 +142,7 @@ function App() {
           from Assembly!
         </p>
       </header>
-      <section className="game-status">
-        <h2>You win!</h2>
-        <p>Well done! 🎉</p>
-      </section>
+      <section className={gameStatusClass}>{renderGameStatus()}</section>
       <section className="language-chips">{languageElements}</section>
       <section className="word">{letterElements}</section>
       <section className="keyboard">{keyboardElements}</section>
