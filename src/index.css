@@ -110,6 +110,10 @@ section.word {
     margin-bottom: 20px;
 }
 
+section.word>span.missed-letter {
+    color: #EC5D49;
+}
+
 section.word>span {
     height: 40px;
     width: 40px;

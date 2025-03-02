@@ -5,7 +5,7 @@ import { languages } from "./languages";
 import { getFarewellText, getWords } from "./utils";
 
 function App() {
-  const [currentWord, setCurrentWord] = React.useState(getWords());
+  const [currentWord, setCurrentWord] = React.useState(() => getWords()); //lazy state initialisation, so it does not re-run on every render.
   const [guessedLetters, setGuessedLetters] = React.useState([]);
 
   // Derived values
@@ -72,16 +72,26 @@ function App() {
     );
   });
 
-  //If the guessedLetters includes the current letter that is being mapped over in the currentWord that means the user has guessed correctly.
-  // Becuase at this point I am only mapping over letters in the actual word. If true it will display the uppercase version of the letter.
-  // If false an empty string is displayed in its place (e.g. nothing).
-  const letterElements = currentWord
-    .split("")
-    .map((letter, index) => (
-      <span key={index}>
-        {guessedLetters.includes(letter) ? letter.toUpperCase() : ""}
+  // spliting the current word and mapping over each letter and assigning the key the index of each letter.
+  // shouldRevealLetter variable has been created to reveal the letters if the game has been lost automatically or if
+  // the guessedLetters includes the letter that is currently being mapped over.
+  // in the span the shouldRevealLetter variable will display an uppercase letter when the user interacts.
+  const letterElements = currentWord.split("").map((letter, index) => {
+    const shouldRevealLetter = isGameLost || guessedLetters.includes(letter);
+
+    {
+      /* Here if the game is lost and the guessed letter was not included in the guessedLetters, then the class
+      missed-letter is added. This class has been set up in the CSS. */
+    }
+    const letterClassName = clsx(
+      isGameLost && !guessedLetters.includes(letter) && "missed-letter"
+    );
+    return (
+      <span className={letterClassName} key={index}>
+        {shouldRevealLetter ? letter.toUpperCase() : ""}
       </span>
-    ));
+    );
+  });
 
   //Checking to see if the guessedLetters includes the current letter that is being mapped over.
   //Checking to see if the guessed letter is correct and the currentWord includes the letter. If this is the case then it is correct.
@@ -164,49 +174,62 @@ function App() {
     return null;
   }
 
+  // When the new game button is hit the currentWord state will get a new word and the guessedLetters state will be empty.
+  function startNewGame() {
+    setCurrentWord(getWords());
+    setGuessedLetters([]);
+  }
+
   return (
     <>
-      <header>
-        <h1>Assembly: Endgame</h1>
-        <p>
-          Guess the word within 8 attempts to keep the programming world safe
-          from Assembly!
-        </p>
-      </header>
-      <section aria-live="polite" role="status" className={gameStatusClass}>
-        {renderGameStatus()}
-      </section>
-      <section className="language-chips">{languageElements}</section>
-      <section className="word">{letterElements}</section>
+      <main>
+        {isGameWon && <Confetti recycle={false} numberOfPieces={1000} />}
+        <header>
+          <h1>Assembly: Endgame</h1>
+          <p>
+            Guess the word within 8 attempts to keep the programming world safe
+            from Assembly!
+          </p>
+        </header>
+        <section aria-live="polite" role="status" className={gameStatusClass}>
+          {renderGameStatus()}
+        </section>
+        <section className="language-chips">{languageElements}</section>
+        <section className="word">{letterElements}</section>
 
-      {/*For the screenreader section, it is being hidden by the CSS through its className.
+        {/*For the screenreader section, it is being hidden by the CSS through its className.
       First p text element is checking to see if the current word includes the lastGuessedLetter. If it does
       it will read out the first message and if it is wrong, it will read out the second message.
       It wil. then read out how many guesses are left based on the deerived value I took from above.*/}
-      <section className="sr-only" aria-live="polite" role="status">
-        <p>
-          {currentWord.includes(lastGuessedLetter)
-            ? `Correct! The last letter ${lastGuessedLetter} is in the word.`
-            : `Sorry, the letter ${lastGuessedLetter} is not in the word.`}
-          You have {numberGuessesLeft} attempt left.
-        </p>
+        <section className="sr-only" aria-live="polite" role="status">
+          <p>
+            {currentWord.includes(lastGuessedLetter)
+              ? `Correct! The last letter ${lastGuessedLetter} is in the word.`
+              : `Sorry, the letter ${lastGuessedLetter} is not in the word.`}
+            You have {numberGuessesLeft} attempt left.
+          </p>
 
-        {/* The p second text element: currentWord is split and turnt into an array and then it is mapped over.
+          {/* The p second text element: currentWord is split and turnt into an array and then it is mapped over.
         For each letter in the array, if the guessedLetters includes the current letter then read out the letter, 
         otherwise it will read out the blank. The full stop puts a pause between them. .join turns it back into a 
         string for it to be read out. */}
-        <p>
-          Current word:
-          {currentWord
-            .split("")
-            .map((letter) =>
-              guessedLetters.includes(letter) ? letter + "." : "blank."
-            )
-            .join(" ")}
-        </p>
-      </section>
-      <section className="keyboard">{keyboardElements}</section>
-      {isGameOver && <button className="new-game">New Game</button>}
+          <p>
+            Current word:
+            {currentWord
+              .split("")
+              .map((letter) =>
+                guessedLetters.includes(letter) ? letter + "." : "blank."
+              )
+              .join(" ")}
+          </p>
+        </section>
+        <section className="keyboard">{keyboardElements}</section>
+        {isGameOver && (
+          <button onClick={startNewGame} className="new-game">
+            New Game
+          </button>
+        )}
+      </main>
     </>
   );
 }
