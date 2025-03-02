@@ -2,10 +2,10 @@ import React from "react";
 import "./App.css";
 import { clsx } from "clsx";
 import { languages } from "./languages";
-import { getFarewellText } from "./utils";
+import { getFarewellText, getWords } from "./utils";
 
 function App() {
-  const [currentWord, setCurrentWord] = React.useState("react");
+  const [currentWord, setCurrentWord] = React.useState(getWords());
   const [guessedLetters, setGuessedLetters] = React.useState([]);
 
   // Derived values
@@ -164,14 +164,6 @@ function App() {
     return null;
   }
 
-  // For the screenreader section, it is being hidden by the CSS through its className.
-  // First p text element is checking to see if the current word includes the lastGuessedLetter. If it does
-  // it will read out the first message and if it is wrong, it will read out the second message.
-  // It wil. then read out how many guesses are left based on the deerived value I took from above.
-
-  // The p second text element: currentWord is split and turnt into an array and then it is mapped over.
-  // For each letter in the array, if the guessedLetters includes the current letter then read out the letter, otherwise
-  // it will read out the blank. The full stop puts a pause between them. .join turns it back into a string for it to be read out.
   return (
     <>
       <header>
@@ -186,6 +178,11 @@ function App() {
       </section>
       <section className="language-chips">{languageElements}</section>
       <section className="word">{letterElements}</section>
+
+      {/*For the screenreader section, it is being hidden by the CSS through its className.
+      First p text element is checking to see if the current word includes the lastGuessedLetter. If it does
+      it will read out the first message and if it is wrong, it will read out the second message.
+      It wil. then read out how many guesses are left based on the deerived value I took from above.*/}
       <section className="sr-only" aria-live="polite" role="status">
         <p>
           {currentWord.includes(lastGuessedLetter)
@@ -193,6 +190,11 @@ function App() {
             : `Sorry, the letter ${lastGuessedLetter} is not in the word.`}
           You have {numberGuessesLeft} attempt left.
         </p>
+
+        {/* The p second text element: currentWord is split and turnt into an array and then it is mapped over.
+        For each letter in the array, if the guessedLetters includes the current letter then read out the letter, 
+        otherwise it will read out the blank. The full stop puts a pause between them. .join turns it back into a 
+        string for it to be read out. */}
         <p>
           Current word:
           {currentWord

@@ -1,3 +1,10 @@
+import { words } from "./words";
+
+// this function gets a random word from the imported words and then it is exported to the currentWord useState.
+export function getWords() {
+  return words[Math.floor(Math.random() * words.length)];
+}
+
 export function getFarewellText(language) {
   const options = [
     `Farewell, ${language}`,
